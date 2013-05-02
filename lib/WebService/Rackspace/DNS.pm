@@ -1,20 +1,58 @@
 package WebService::Rackspace::DNS;
 
 use 5.010;
-use Any::Moose;
+use Mouse;
+
+# ABSTRACT: WebService::Rackspace::DNS - an interface to rackspace.com's RESTful Cloud DNS API using Web::API
+
+# VERSION
+
 with 'Web::API';
 
-=head1 NAME
+=head1 SYNOPSIS
 
-WebService::Rackspace::DNS - an interface to rackspace.com's RESTful Cloud DNS API using Web::API
+Please refer to the API documentation at L<http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/overview.html>
 
-=head1 VERSION
+    use WebService::Rackspace::DNS;
+    use Data::Dumper;
+    
+    my $dns = WebService::Rackspace::DNS->new(
+        debug   => 1,
+        user    => 'jsmith',
+        api_key => 'aaaaa-bbbbb-ccccc-12345678',
+    );
+    
+    my $response = $dns->create_domain(
+        domains => [ {
+            name => "blablub.com",
+            emailAddress => 'bleep@bloop.com',
+            recordsList => {
+                records => [ {
+                    name => "blablub.com",
+                    type => "MX",
+                    priority => 10,
+                    data => "127.0.0.1"
+                },
+                {
+                    name => "ftp.blablub.com",
+                    ttl  => 3600,
+                    type => "A",
+                    data => "127.0.0.1"
+                    comment => "A record for FTP server",
+                } ],
+            },
+        } ]
+    );
+    print Dumper($response);
 
-Version 0.1
+    $response = $dns->status(id => "some-funny-long-job-identifier");
+    print Dumper($response);
+
+=head1 ATTRIBUTES
+
+=head2 location
 
 =cut
-
-our $VERSION = '0.1';
 
 has 'location' => (
     is      => 'rw',
@@ -22,6 +60,64 @@ has 'location' => (
     lazy    => 1,
     default => sub { '' },
 );
+
+=head1 SUBROUTINES/METHODS
+
+=head2 limits
+
+=head2 limit_types
+
+=head2 limit
+
+=head2 domains
+
+=head2 domain
+
+=head2 domain_history
+
+=head2 zonefile
+
+=head2 create_domain
+
+=head2 import_domain
+
+=head2 update_domain
+
+=head2 update_domains
+
+=head2 delete_domain
+
+=head2 delete_domains
+
+=head2 subdomains
+
+=head2 records
+
+=head2 record
+
+=head2 create_record
+
+=head2 update_record
+
+=head2 update_records
+
+=head2 delete_record
+
+=head2 delete_records
+
+=head2 ptrs
+
+=head2 ptr
+
+=head2 create_ptr
+
+=head2 update_ptr
+
+=head2 delete_ptr
+
+=head2 status
+
+=cut
 
 has 'commands' => (
     is      => 'rw',
@@ -179,101 +275,6 @@ sub commands {
     return $self->commands;
 }
 
-=head1 SYNOPSIS
-
-Please refer to the API documentation at L<http://docs.rackspace.com/cdns/api/v1.0/cdns-devguide/content/overview.html>
-
-    use WebService::Rackspace::DNS;
-    use Data::Dumper;
-    
-    my $dns = WebService::Rackspace::DNS->new(
-        debug   => 1,
-        user    => 'jsmith',
-        api_key => 'aaaaa-bbbbb-ccccc-12345678',
-    );
-    
-    my $response = $dns->create_domain(
-        domains => [ {
-            name => "blablub.com",
-            emailAddress => 'bleep@bloop.com',
-            recordsList => {
-                records => [ {
-                    name => "blablub.com",
-                    type => "MX",
-                    priority => 10,
-                    data => "127.0.0.1"
-                },
-                {
-                    name => "ftp.blablub.com",
-                    ttl  => 3600,
-                    type => "A",
-                    data => "127.0.0.1"
-                    comment => "A record for FTP server",
-                } ],
-            },
-        } ]
-    );
-    print Dumper($response);
-
-    $response = $dns->status(id => "some-funny-long-job-identifier");
-    print Dumper($response);
-
-=head1 SUBROUTINES/METHODS
-
-=head2 limits
-
-=head2 limit_types
-
-=head2 limit
-
-=head2 domains
-
-=head2 domain
-
-=head2 domain_history
-
-=head2 zonefile
-
-=head2 create_domain
-
-=head2 import_domain
-
-=head2 update_domain
-
-=head2 update_domains
-
-=head2 delete_domain
-
-=head2 delete_domains
-
-=head2 subdomains
-
-=head2 records
-
-=head2 record
-
-=head2 create_record
-
-=head2 update_record
-
-=head2 update_records
-
-=head2 delete_record
-
-=head2 delete_records
-
-=head2 ptrs
-
-=head2 ptr
-
-=head2 create_ptr
-
-=head2 update_ptr
-
-=head2 delete_ptr
-
-=head2 status
-
 =head1 INTERNALS
 
 =head2 login
@@ -347,15 +348,10 @@ sub BUILD {
     return $self;
 }
 
-=head1 AUTHOR
-
-Tobias Kirschstein, C<< <lev at cpan.org> >>
-
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-WebService-Rackspace-DNS at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-Rackspace-DNS>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests on GitHub's issue tracker L<https://github.com/nupfel/WebService-Rackspace-DNS/issues>.
+
 
 =head1 SUPPORT
 
@@ -363,38 +359,37 @@ You can find documentation for this module with the perldoc command.
 
     perldoc WebService::Rackspace::DNS
 
+
 You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub repository
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Rackspace-DNS>
+L<https://github.com/nupfel/WebService-Rackspace-DNS>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/module/WebService::Rackspace::DNS>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/WebService-Rackspace-DNS>
+L<http://annocpan.org/dist/WebService::Rackspace::DNS>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/WebService-Rackspace-DNS>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/WebService-Rackspace-DNS/>
+L<http://cpanratings.perl.org/d/WebService::Rackspace::DNS>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Tobias Kirschstein.
+=head1 ACKNOWLEDGEMENTS
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=over 4
 
-See http://dev.perl.org/licenses/ for more information.
+=item * Lenz Gschwendtner (@norbu09), for being an awesome mentor and friend.
 
+=back
 
 =cut
 
