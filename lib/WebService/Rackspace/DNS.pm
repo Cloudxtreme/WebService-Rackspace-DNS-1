@@ -132,24 +132,16 @@ has 'commands' => (
             },
 
             # limits
-            limits      => { path        => 'limits' },
-            limit_types => { path        => 'limits/types' },
-            limit       => { pre_id_path => 'limits', require_id => 1 },
+            limits      => { path => 'limits' },
+            limit_types => { path => 'limits/types' },
+            limit       => { path => 'limits/:id' },
 
             # domains
-            domains => { path        => 'domains' },
-            domain  => { pre_id_path => 'domains', require_id => 1 },
-            domain_history => {
-                pre_id_path  => 'domains',
-                post_id_path => 'changes',
-                require_id   => 1,
-            },
-            zonefile => {
-                pre_id_path  => 'domains',
-                post_id_path => 'export',
-                require_id   => 1,
-            },
-            create_domain => {
+            domains        => { path => 'domains' },
+            domain         => { path => 'domains/:id' },
+            domain_history => { path => 'domains/:id/changes', },
+            zonefile       => { path => 'domains/:id/export', },
+            create_domain  => {
                 method    => 'POST',
                 path      => 'domains',
                 mandatory => ['domains'],
@@ -163,9 +155,8 @@ has 'commands' => (
                 # default_attributes => { contentType => 'BIND_9' },
             },
             update_domain => {
-                method      => 'PUT',
-                pre_id_path => 'domains',
-                require_id  => 1,
+                method => 'PUT',
+                path   => 'domains/:id',
             },
             update_domains => {
                 method    => 'PUT',
@@ -173,74 +164,48 @@ has 'commands' => (
                 mandatory => ['domains'],
             },
             delete_domain => {
-                method      => 'DELETE',
-                pre_id_path => 'domains',
-                require_id  => 1,
+                method => 'DELETE',
+                path   => 'domains/:id',
             },
             delete_domains => {
                 method    => 'DELETE',
                 path      => 'domains',
                 mandatory => ['id'],
             },
-            subdomains => {
-                pre_id_path  => 'domains',
-                post_id_path => 'subdomains',
-                require_id   => 1,
-            },
+            subdomains => { path => 'domains/:id/subdomains', },
 
             # records
-            records => {
-                pre_id_path  => 'domains',
-                post_id_path => 'records',
-                require_id   => 1,
-            },
-            record => {
-                pre_id_path  => 'domains',
-                post_id_path => 'records/:record_id',
-                require_id   => 1,
-            },
+            records       => { path => 'domains/:id/records', },
+            record        => { path => 'domains/:id/records/:record_id', },
             create_record => {
-                method       => 'POST',
-                pre_id_path  => 'domains',
-                post_id_path => 'records',
-                require_id   => 1,
+                method => 'POST',
+                path   => 'domains/:id/records',
             },
             update_record => {
-                method       => 'PUT',
-                pre_id_path  => 'domains',
-                post_id_path => 'records/:record_id',
-                require_id   => 1,
+                method => 'PUT',
+                path   => 'domains/:id/records/:record_id',
             },
             update_records => {
-                method       => 'PUT',
-                pre_id_path  => 'domains',
-                post_id_path => 'records',
-                require_id   => 1,
+                method => 'PUT',
+                path   => 'domains/:id/records',
             },
             delete_record => {
-                method       => 'DELETE',
-                pre_id_path  => 'domains',
-                post_id_path => 'records/:record_id',
-                require_id   => 1,
+                method => 'DELETE',
+                path   => 'domains/:id/records/:record_id',
             },
             delete_records => {
-                method       => 'DELETE',
-                pre_id_path  => 'domains',
-                post_id_path => 'records',
-                require_id   => 1,
+                method => 'DELETE',
+                path   => 'domains/:id/records',
             },
 
             # PTRs
             ptrs => {
-                pre_id_path => 'rdns',
-                require_id  => 1,
-                mandatory   => ['href'],
+                path      => 'rdns/:id',
+                mandatory => ['href'],
             },
             ptr => {
-                pre_id_path  => 'rdns',
-                post_id_path => ':record_id',
-                require_id   => 1,
-                mandatory    => ['href'],
+                path      => 'rdns/:id/:record_id',
+                mandatory => ['href'],
             },
             create_ptr => {
                 method    => 'POST',
@@ -253,17 +218,15 @@ has 'commands' => (
                 mandatory => [ 'recordsList', 'link' ],
             },
             delete_ptr => {
-                method      => 'DELETE',
-                pre_id_path => 'rdns',
-                require_id  => 1,
-                mandatory   => ['href'],
-                optional    => ['ip'],
+                method    => 'DELETE',
+                path      => 'rdns/:id',
+                mandatory => ['href'],
+                optional  => ['ip'],
             },
 
             # jobs status
             status => {
-                pre_id_path        => 'status',
-                require_id         => 1,
+                path               => 'status/:id',
                 default_attributes => { showDetails => 'true' },
             },
         };
@@ -322,7 +285,7 @@ basic configuration for the client API happens usually in the BUILD method when 
 sub BUILD {
     my ($self) = @_;
 
-    $self->user_agent(__PACKAGE__ . ' ' . $VERSION);
+    $self->user_agent(__PACKAGE__ . ' ' . $WebService::Rackspace::DNS::VERSION);
     $self->content_type('application/json');
 
     # $self->extension('json');
